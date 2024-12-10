@@ -31,12 +31,13 @@ public class MyThread extends Thread {
 
             //Risposta
             if(page.isBlank() || page.equals("index.html") || page.equals("file.txt")){
-                String responseBody  = "<b><i>Benvenuti nella WebPage di Chen!</i></b>";
+                String responseBody  = "<h1><b><i><center>Benvenuti nella WebPage di Chen!<center></i></b></h1>";
                 out.writeBytes("HTTP/1.1 200 OK\n");
                 out.writeBytes("Content-Type: text/html\n");
                 out.writeBytes("Content-Length: " + responseBody.length() + "\n");
                 out.writeBytes("\n"); //Riga vuota per far capire che ho finito di inviare le intestazioni e inizio col body
                 out.writeBytes(responseBody + "\r\n"); 
+
             } else {
                 out.writeBytes("HTTP/1.1 404 Not Found\n");
                 out.writeBytes("Content-Length: 0\n");
