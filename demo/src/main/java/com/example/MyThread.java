@@ -19,15 +19,22 @@ public class MyThread extends Thread {
         try {
             BufferedReader  in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
+
             do {      
                 rcv = in.readLine();
                 System.out.println(rcv + "\n");
             } while (!rcv.equals("") );
             
-            String finale  = "HTTP/1.1 404 Not Found\r\n"+ "Content-Length:0 \r\n" + "\r\n";
-            out.writeBytes(finale);
-            s.close();
-        } catch (IOException e) {
+            System.out.println("Richiesta Terminata");
+
+            String responseBody  = "<b>Hello World!</b> <img src= \"smile.png\">";
+            out.writeBytes("HTTP/1.1 200 OK\n");
+            out.writeBytes("Content-Type: text/html\n");
+            out.writeBytes("Content-Length" + responseBody.length() + "\n");
+            out.writeBytes("\n"); //Riga vuota per far capire che ho finito di inviare le intestazioni e inizio col body
+            out.writeBytes(responseBody + "\r\n");
+
+        } catch (IOException e) { 
             // TODO Auto-generated catch block
             e.printStackTrace();
         }   
