@@ -15,7 +15,6 @@ public class MyThread extends Thread {
     }
 
     public void run() {
-        do {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 DataOutputStream out = new DataOutputStream(s.getOutputStream());
@@ -35,19 +34,34 @@ public class MyThread extends Thread {
     
                 // Decodifica l'URL e ottieni il percorso
                 String page = URLDecoder.decode(request[1], StandardCharsets.UTF_8);
-    
+
                 // Gestisci la situazione di root ("/")
                 if (page.equals("/")) {
                     page = "/index.html"; // Per esempio, restituisci index.html come predefinito
                 }
     
                 System.out.println("Richiesta Terminata");
+                System.out.println(page);
     
+                if(page.endsWith("/"))
+                    page = page + "index.html";
+
+
+                System.out.println(page);
                 // Accedi al file richiesto
                 File file = new File("htdocs" + page);
-                if (file.exists() && !file.isDirectory()) {
-                    // Se il file esiste, invia la risposta 200 OK
-                    try (InputStream input = new FileInputStream(file)) {
+
+                if(file.isDirectory()){
+
+                    out.writeBytes("HTTP/1.1 301 Moved Permanently\n");
+                    out.writeBytes("Content-Length: 0\n");
+                    out.writeBytes("Location: " + page + "/\n");
+                    out.writeBytes("\n");
+
+                } else if (file.exists()) {
+                    
+                    try(InputStream input = new FileInputStream(file);){
+                        // Se il file esiste, invia la risposta 200 OK
                         out.writeBytes("HTTP/1.1 200 OK\n");
                         out.writeBytes("Content-Length: " + file.length() + "\n");
                         out.writeBytes("Content-Type: " + getContentType(file) + "\n");
@@ -59,6 +73,7 @@ public class MyThread extends Thread {
                         while ((n = input.read(buf)) != -1) {
                             out.write(buf, 0, n);
                         }
+                        input.close();
                     }
     
                 } else {
@@ -67,11 +82,11 @@ public class MyThread extends Thread {
                     out.writeBytes("Content-Length: 0\n");
                     out.writeBytes("\n");
                 }
+                s.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             
-        } while (true);
     }
 
     private String getContentType(File f) {
